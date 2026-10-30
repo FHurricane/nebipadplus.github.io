@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="NebiPad+ Suite: scrittura, impaginazione, diagrammi e matematica in un'unica applicazione desktop.">
+  <meta name="theme-color" content="#0f6cbd">
+  <title>NebiPad+ Suite</title>
+  <link rel="icon" href="../assets/nebipad-logo.svg" type="image/svg+xml">
+  <style>
+    :root {
+      --blue: #0f6cbd;
+      --blue-dark: #0b4f8a;
+      --navy: #10243e;
+      --cyan: #56a7f6;
+      --mint: #69dbc9;
+      --ink: #242424;
+      --muted: #616161;
+      --line: #e5e5e5;
+      --surface: #ffffff;
+      --soft: #f5f7fa;
+      --shadow: 0 12px 32px rgba(15, 42, 70, .12);
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--surface);
+      font-family: "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, sans-serif;
+      line-height: 1.55;
+    }
+    img { display: block; max-width: 100%; }
+    a { color: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    .container { width: min(1180px, calc(100% - 40px)); margin-inline: auto; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255, 255, 255, .9);
+      border-bottom: 1px solid rgba(0, 0, 0, .08);
+      backdrop-filter: blur(18px) saturate(150%);
+    }
+    .nav { min-height: 64px; display: flex; align-items: center; gap: 28px; }
+    .brand { display: inline-flex; align-items: center; gap: 11px; text-decoration: none; font-weight: 650; font-size: 20px; }
+    .brand img { width: 34px; height: 34px; }
+    .brand span { color: var(--blue); }
+    .nav-links { display: flex; align-items: center; gap: 26px; margin-left: auto; }
+    .nav-links a { text-decoration: none; color: #424242; font-size: 14px; }
+    .nav-links a:hover { color: var(--blue); }
+    .nav-download { padding: 9px 17px; color: #fff !important; background: var(--blue); border-radius: 4px; font-weight: 600; }
+    .menu-button { display: none; margin-left: auto; border: 0; background: transparent; font-size: 24px; cursor: pointer; }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 90px 0 80px;
+      background:
+        radial-gradient(circle at 83% 28%, rgba(105, 219, 201, .3), transparent 24%),
+        linear-gradient(118deg, #eef7ff 0%, #f9fbfd 48%, #edf6f8 100%);
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 460px;
+      height: 460px;
+      right: -230px;
+      bottom: -250px;
+      border: 70px solid rgba(15, 108, 189, .07);
+      border-radius: 50%;
+    }
+    .hero-grid { position: relative; z-index: 1; display: grid; grid-template-columns: 1.03fr .97fr; align-items: center; gap: 64px; }
+    .eyebrow { margin: 0 0 14px; color: var(--blue); font-size: 14px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    h1 { max-width: 680px; margin: 0; font-size: clamp(46px, 6.2vw, 78px); line-height: 1.02; letter-spacing: -.045em; font-weight: 650; }
+    .hero-copy > p:not(.eyebrow) { max-width: 620px; margin: 24px 0 30px; color: #4a4a4a; font-size: 20px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+    .button { min-height: 46px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; padding: 11px 22px; border: 2px solid var(--blue); border-radius: 4px; text-decoration: none; font-weight: 650; transition: .18s ease; }
+    .button.primary { color: white; background: var(--blue); }
+    .button.primary:hover { background: var(--blue-dark); border-color: var(--blue-dark); transform: translateY(-1px); }
+    .button.secondary { color: var(--blue); background: white; }
+    .button.secondary:hover { background: #f4f9fd; }
+    .platform-note { margin-top: 17px; color: var(--muted); font-size: 13px; }
+
+    .app-window { position: relative; border: 1px solid rgba(16, 36, 62, .13); border-radius: 18px; background: rgba(255,255,255,.83); box-shadow: 0 30px 65px rgba(15, 62, 96, .2); overflow: hidden; transform: rotate(1deg); }
+    .window-bar { height: 42px; display: flex; align-items: center; padding: 0 14px; gap: 7px; background: #f5f5f5; border-bottom: 1px solid #ddd; }
+    .dot { width: 11px; height: 11px; border-radius: 50%; background: #c7c7c7; }
+    .window-title { margin: auto; padding-right: 42px; color: #555; font-size: 12px; }
+    .window-content { display: grid; grid-template-columns: 38% 62%; min-height: 370px; }
+    .window-side { padding: 36px 24px; color: #fff; background: linear-gradient(145deg, var(--navy), #254b7e); }
+    .window-side img { width: 76px; margin-bottom: 22px; filter: drop-shadow(0 8px 18px rgba(0,0,0,.18)); }
+    .window-side strong { display: block; font-size: 25px; line-height: 1.15; }
+    .window-side p { color: #d8eafb; font-size: 13px; }
+    .window-main { padding: 34px 28px; background: #fff; }
+    .window-main h3 { margin: 0 0 22px; font-size: 21px; }
+    .mini-apps { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
+    .mini-app { min-height: 98px; padding: 15px; border: 1px solid #e2e7eb; border-radius: 10px; background: #fafcfd; }
+    .mini-app img { width: 36px; height: 36px; margin-bottom: 9px; }
+    .mini-app span { font-size: 13px; font-weight: 600; }
+
+    section { padding: 88px 0; }
+    .section-head { max-width: 700px; margin-bottom: 42px; }
+    .section-head h2 { margin: 0 0 15px; font-size: clamp(34px, 4vw, 48px); line-height: 1.1; letter-spacing: -.025em; font-weight: 620; }
+    .section-head p { margin: 0; color: var(--muted); font-size: 18px; }
+    .suite { background: var(--soft); }
+    .suite-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
+    .suite-card { position: relative; min-width: 0; min-height: 275px; padding: 22px 20px; border: 1px solid var(--line); border-radius: var(--radius); background: white; overflow: hidden; transition: transform .2s, box-shadow .2s; }
+    .suite-card:hover { transform: translateY(-5px); box-shadow: var(--shadow); }
+    .suite-card::after { content: ""; position: absolute; inset: auto 0 0; height: 5px; background: var(--accent); }
+    .suite-card img { width: 52px; height: 52px; margin-bottom: 20px; }
+    .suite-card h3 { margin: 0 0 9px; font-size: 20px; }
+    .suite-card p { margin: 0; color: var(--muted); font-size: 14px; }
+    .suite-card:nth-child(1) { --accent: #1766a5; }
+    .suite-card:nth-child(2) { --accent: #16739d; }
+    .suite-card:nth-child(3) { --accent: #4c5bb3; }
+    .suite-card:nth-child(4) { --accent: #7448aa; }
+    .suite-card:nth-child(5) { --accent: #a83f8b; }
+
+    .feature-layout { display: grid; grid-template-columns: .9fr 1.1fr; gap: 70px; align-items: center; }
+    .feature-art { position: relative; min-height: 470px; border-radius: 24px; background: linear-gradient(150deg, #10243e, #1766a5 72%, #69dbc9); overflow: hidden; box-shadow: var(--shadow); }
+    .feature-art > img { position: absolute; width: 76%; left: 12%; top: 12%; border-radius: 12px; box-shadow: 0 22px 45px rgba(0,0,0,.24); }
+    .tool-strip { position: absolute; display: flex; gap: 10px; left: 8%; bottom: 8%; padding: 13px; background: rgba(255,255,255,.92); border-radius: 12px; box-shadow: 0 9px 26px rgba(0,0,0,.16); }
+    .tool-strip img { width: 28px; height: 28px; padding: 4px; }
+    .feature-list { display: grid; gap: 8px; }
+    .feature-item { display: grid; grid-template-columns: 42px 1fr; gap: 14px; padding: 17px 0; border-bottom: 1px solid var(--line); }
+    .feature-item img { width: 30px; height: 30px; margin-top: 3px; }
+    .feature-item h3 { margin: 0 0 4px; font-size: 18px; }
+    .feature-item p { margin: 0; color: var(--muted); font-size: 15px; }
+
+    .open-source { padding-top: 0; }
+    .downloads { padding-top: 0; }
+    .download-panel { padding: 46px; border: 1px solid var(--line); border-radius: 20px; background: linear-gradient(135deg, #f5f9fd, #eef8f7); }
+    .download-panel .section-head { margin-bottom: 30px; }
+    .download-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .download-button { display: flex; align-items: center; gap: 16px; min-height: 92px; padding: 18px 20px; color: var(--ink); border: 1px solid #d8e1e8; border-radius: 10px; background: #fff; text-decoration: none; box-shadow: 0 4px 12px rgba(15, 42, 70, .05); transition: transform .18s, border-color .18s, box-shadow .18s; }
+    .download-button:hover { transform: translateY(-3px); border-color: var(--blue); box-shadow: 0 10px 22px rgba(15, 108, 189, .13); }
+    .download-button svg { flex: 0 0 auto; width: 38px; height: 38px; fill: var(--navy); }
+    .download-button strong, .download-button small { display: block; }
+    .download-button strong { margin-bottom: 2px; font-size: 17px; }
+    .download-button small { color: var(--muted); font-size: 12px; }
+    .download-menu { position: relative; }
+    .download-menu summary { width: 100%; cursor: pointer; list-style: none; }
+    .download-menu summary::-webkit-details-marker { display: none; }
+    .download-menu summary::after { content: "⌄"; margin-left: auto; color: var(--blue); font-size: 23px; line-height: 1; transition: transform .18s; }
+    .download-menu[open] summary { border-color: var(--blue); box-shadow: 0 10px 22px rgba(15, 108, 189, .13); }
+    .download-menu[open] summary::after { transform: rotate(180deg); }
+    .download-options { position: absolute; z-index: 5; top: calc(100% + 8px); right: 0; left: 0; padding: 8px; border: 1px solid #d8e1e8; border-radius: 10px; background: #fff; box-shadow: var(--shadow); }
+    .download-option { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 13px 12px; border-radius: 7px; text-decoration: none; }
+    .download-option:hover, .download-option:focus-visible { color: var(--blue); background: #edf6fd; outline: none; }
+    .download-option span { font-weight: 650; }
+    .download-option small { color: var(--muted); }
+    .download-option b { color: var(--blue); font-size: 18px; }
+    .open-panel { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 36px; padding: 52px; color: white; border-radius: 20px; background: linear-gradient(115deg, #0d3153, #0f6cbd); box-shadow: var(--shadow); }
+    .open-panel h2 { margin: 0 0 10px; font-size: clamp(30px, 4vw, 45px); line-height: 1.12; }
+    .open-panel p { max-width: 700px; margin: 0; color: #d9ecfb; }
+    .open-panel .button { color: var(--navy); border-color: white; background: white; white-space: nowrap; }
+
+    footer { padding: 38px 0; background: #f2f2f2; color: #555; font-size: 13px; }
+    .footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 22px; }
+    .footer-brand { display: flex; align-items: center; gap: 10px; font-weight: 650; }
+    .footer-brand img { width: 28px; }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 20px; }
+    .footer-links a { text-decoration: none; }
+    .footer-links a:hover { text-decoration: underline; }
+
+    @media (max-width: 900px) {
+      .hero-grid, .feature-layout { grid-template-columns: 1fr; }
+      .hero { padding-top: 65px; }
+      .app-window { max-width: 620px; transform: none; }
+      .suite-grid { grid-template-columns: 1fr 1fr; }
+      .suite-card, .suite-card:first-child { grid-column: auto; }
+      .suite-card:last-child { grid-column: 1 / -1; }
+      .download-grid { grid-template-columns: 1fr; }
+      .feature-art { min-height: 420px; }
+    }
+    @media (max-width: 680px) {
+      .container { width: min(100% - 28px, 1180px); }
+      .menu-button { display: block; }
+      .nav-links { position: absolute; inset: 64px 0 auto; display: none; padding: 20px; background: white; border-bottom: 1px solid var(--line); box-shadow: var(--shadow); }
+      .nav-links.open { display: grid; }
+      .nav-download { text-align: center; }
+      .hero { padding: 52px 0 58px; }
+      h1 { font-size: 47px; }
+      .hero-copy > p:not(.eyebrow) { font-size: 18px; }
+      .window-content { grid-template-columns: 1fr; }
+      .window-side { display: none; }
+      .window-main { padding: 25px 20px; }
+      .suite-grid { grid-template-columns: 1fr; }
+      .suite-card:last-child { grid-column: auto; }
+      .download-panel { padding: 32px 22px; }
+      .download-options { position: static; margin-top: 8px; box-shadow: 0 6px 18px rgba(15, 42, 70, .09); }
+      section { padding: 66px 0; }
+      .feature-art { min-height: 330px; }
+      .open-panel { grid-template-columns: 1fr; padding: 34px 26px; }
+      .footer-inner { align-items: flex-start; flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <nav class="container nav" aria-label="Navigazione principale">
+      <a class="brand" href="#top"><img src="../assets/nebipad-logo.svg" alt=""><span>NebiPad+</span> Suite</a>
+      <button class="menu-button" type="button" aria-expanded="false" aria-label="Apri il menu">☰</button>
+      <div class="nav-links">
+        <a href="#suite">La suite</a>
+        <a href="#funzioni">Funzioni</a>
+        <a href="https://github.com/FHurricane/NebiPadPlusSuite" target="_blank" rel="noreferrer">GitHub</a>
+        <a class="nav-download" href="#download">Scarica</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Creatività, senza interruzioni</p>
+          <h1>Ogni idea trova il suo spazio.</h1>
+          <p>Scrivi codice e documenti, costruisci diagrammi e lavora con la matematica. NebiPad+ riunisce gli strumenti essenziali in un’unica suite desktop chiara e veloce.</p>
+          <div class="actions">
+            <a class="button primary" href="#download">Scarica la suite <span aria-hidden="true">↓</span></a>
+            <a class="button secondary" href="#suite">Esplora la suite</a>
+          </div>
+          <div class="platform-note">Disponibile anche per Windows e Linux • Progetto open source</div>
+        </div>
+
+        <div class="app-window" aria-label="Anteprima della schermata iniziale di NebiPad+">
+          <div class="window-bar"><i class="dot"></i><i class="dot"></i><i class="dot"></i><span class="window-title">NebiPad+ Suite</span></div>
+          <div class="window-content">
+            <div class="window-side"><img src="../assets/nebipad-logo.svg" alt="Logo NebiPad+"><strong>Benvenuto nella tua suite.</strong><p>Un punto di partenza per testi, idee e progetti.</p></div>
+            <div class="window-main">
+              <h3>Cosa vuoi creare?</h3>
+              <div class="mini-apps">
+                <div class="mini-app"><img src="../assets/suite-0.svg" alt=""><span>NebiPad+</span></div>
+                <div class="mini-app"><img src="../assets/suite-1.svg" alt=""><span>MindNet</span></div>
+                <div class="mini-app"><img src="../assets/suite-2.svg" alt=""><span>Impagination</span></div>
+                <div class="mini-app"><img src="../assets/suite-3.svg" alt=""><span>Math</span></div>
+                <div class="mini-app"><img src="../assets/suite-4.svg" alt=""><span>NebImage+</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="suite" id="suite">
+      <div class="container">
+        <div class="section-head"><p class="eyebrow">Cinque spazi, un solo flusso</p><h2>La suite che si adatta al tuo lavoro</h2><p>Passa dalla scrittura alla progettazione visiva senza uscire dall’ambiente NebiPad+.</p></div>
+        <div class="suite-grid">
+          <article class="suite-card"><img src="../assets/suite-0.svg" alt=""><h3>NebiPad+</h3><p>Editor di testo e codice con schede, sintassi, completamento, LSP, macro e strumenti di sicurezza.</p></article>
+          <article class="suite-card"><img src="../assets/suite-1.svg" alt=""><h3>MindNet</h3><p>Mappe mentali, diagrammi di flusso e schemi di rete su tele A4 e A3 completamente modificabili.</p></article>
+          <article class="suite-card"><img src="../assets/suite-2.svg" alt=""><h3>Impagination</h3><p>Documenti ricchi con stili, immagini, tabelle, grafici, audio, video ed esportazione PDF.</p></article>
+          <article class="suite-card"><img src="../assets/suite-3.svg" alt=""><h3>Math</h3><p>Uno spazio dedicato a testo e simboli matematici Unicode, pronto per lo studio e la scrittura tecnica.</p></article>
+          <article class="suite-card"><img src="../assets/suite-4.svg" alt=""><h3>NebImage+</h3><p>Visualizza e gestisci fotografie, ritaglia, ridimensiona, regola colori e converti intere raccolte di immagini.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="funzioni">
+      <div class="container feature-layout">
+        <div class="feature-art">
+          <img src="../assets/nebipad-welcome.png" alt="Schermata di benvenuto di NebiPad+">
+          <div class="tool-strip" aria-hidden="true"><img src="../assets/new.svg" alt=""><img src="../assets/open.svg" alt=""><img src="../assets/save.svg" alt=""><img src="../assets/pdf.svg" alt=""><img src="../assets/chart.svg" alt=""></div>
+        </div>
+        <div>
+          <div class="section-head"><p class="eyebrow">Pensata per il desktop</p><h2>Strumenti familiari, possibilità nuove</h2><p>Un’interfaccia ordinata accompagna ogni attività, dal primo appunto al documento finale.</p></div>
+          <div class="feature-list">
+            <div class="feature-item"><img src="../assets/bold.svg" alt=""><div><h3>Scrittura completa</h3><p>Formattazione, ricerca, codifiche, stampa e gestione avanzata dei documenti.</p></div></div>
+            <div class="feature-item"><img src="../assets/record.svg" alt=""><div><h3>Voce e registrazioni</h3><p>Dettatura vocale e note audio collegate direttamente al testo.</p></div></div>
+            <div class="feature-item"><img src="../assets/connection.svg" alt=""><div><h3>Diagrammi visuali</h3><p>Forme, collegamenti, simboli di rete, griglie e modelli pronti all’uso.</p></div></div>
+            <div class="feature-item"><img src="../assets/encrypt.svg" alt=""><div><h3>Controllo e sicurezza</h3><p>Crittografia OpenPGP, generatori di hash e password robuste integrati.</p></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="downloads" id="download">
+      <div class="container">
+        <div class="download-panel">
+          <div class="section-head"><p class="eyebrow">Download</p><h2>Scegli il tuo sistema operativo</h2><p>Scarica dal server ufficiale il pacchetto adatto al tuo computer.</p></div>
+          <div class="download-grid">
+            <a class="download-button" href="https://www.costafabio.it/applicazioni/nebipadplussuite/NebiPadPlusSuite-macOS.dmg" aria-label="Scarica NebiPad+ Suite per macOS">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.1 12.5c0-2.7 2.2-4 2.3-4.1a5 5 0 0 0-3.9-2.1c-1.7-.2-3.2 1-4.1 1s-2.2-1-3.7-1c-1.9 0-3.7 1.1-4.7 2.8-2 3.5-.5 8.7 1.4 11.5.9 1.4 2 2.9 3.5 2.8 1.4-.1 2-1 3.7-1s2.2 1 3.7 1c1.6 0 2.6-1.4 3.5-2.8a12.5 12.5 0 0 0 1.6-3.3 4.7 4.7 0 0 1-3.3-4.8ZM14.4 4.6A4.8 4.8 0 0 0 15.5 1a5 5 0 0 0-3.3 1.7 4.6 4.6 0 0 0-1.2 3.5 4.1 4.1 0 0 0 3.4-1.6Z"/></svg>
+              <span><strong>macOS</strong><small>Installer DMG · Apple Silicon</small></span>
+            </a>
+            <a class="download-button" href="https://www.costafabio.it/applicazioni/nebipadplussuite/NebiPadPlusSuite-Windows-x64.exe" aria-label="Scarica NebiPad+ Suite per Windows">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 4.2 10.6 3v8.3H2V4.2Zm9.6-1.4L22 1.3v10h-10.4V2.8ZM2 12.3h8.6v8.4L2 19.5v-7.2Zm9.6 0H22v10.1l-10.4-1.5v-8.6Z"/></svg>
+              <span><strong>Windows</strong><small>Installer EXE · 64 bit</small></span>
+            </a>
+            <details class="download-menu">
+              <summary class="download-button" aria-label="Mostra i download di NebiPad+ Suite per Linux">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.3c-3 0-4.1 2.6-4 5.4 0 1-.3 1.8-.8 2.6-1.2 1.8-2.8 4.1-2.1 6.6.3 1.1 1 1.7 2 2.1-.3.7-.2 1.5.5 2 .8.6 2 .3 2.8-.4.5.2 1 .3 1.6.3s1.1-.1 1.6-.3c.8.7 2 1 2.8.4.7-.5.8-1.3.5-2 1-.4 1.7-1 2-2.1.7-2.5-.9-4.8-2.1-6.6-.5-.8-.8-1.6-.8-2.6.1-2.8-1-5.4-4-5.4Zm-1.8 4.3c-.5 0-.8-.5-.8-1s.3-1 .8-1 .8.5.8 1-.3 1-.8 1Zm3.6 0c-.5 0-.8-.5-.8-1s.3-1 .8-1 .8.5.8 1-.3 1-.8 1Zm-1.8 0c.7 0 1.3.4 1.3.8s-.6.8-1.3.8-1.3-.4-1.3-.8.6-.8 1.3-.8Zm-3.8 10.9c-.8 0-1.4-.7-1.4-1.6 0-1 .6-1.7 1.4-1.7s1.4.7 1.4 1.7c0 .9-.6 1.6-1.4 1.6Zm7.6 0c-.8 0-1.4-.7-1.4-1.6 0-1 .6-1.7 1.4-1.7s1.4.7 1.4 1.7c0 .9-.6 1.6-1.4 1.6Z"/></svg>
+                <span><strong>Linux</strong><small>Scegli DEB, RPM o AppImage</small></span>
+              </summary>
+              <div class="download-options">
+                <a class="download-option" href="https://www.costafabio.it/applicazioni/nebipadplussuite/NebiPadPlusSuite-Linux-amd64.deb"><span>Pacchetto DEB</span><small>Debian, Ubuntu, Mint</small><b aria-hidden="true">↓</b></a>
+                <a class="download-option" href="https://www.costafabio.it/applicazioni/nebipadplussuite/NebiPadPlusSuite-Linux-x86_64.rpm"><span>Pacchetto RPM</span><small>Fedora, RHEL, openSUSE</small><b aria-hidden="true">↓</b></a>
+                <a class="download-option" href="https://www.costafabio.it/applicazioni/nebipadplussuite/NebiPadPlusSuite-Linux-x86_64.AppImage"><span>AppImage</span><small>Distribuzione universale</small><b aria-hidden="true">↓</b></a>
+              </div>
+            </details>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="open-source">
+      <div class="container">
+        <div class="open-panel">
+          <div><h2>Libero, aperto, costruito per crescere.</h2><p>Esplora il codice, segnala un problema o contribuisci al futuro di NebiPad+ Suite direttamente su GitHub.</p></div>
+          <a class="button" href="https://github.com/FHurricane/NebiPadPlusSuite" target="_blank" rel="noreferrer">Visualizza su GitHub →</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <div class="footer-brand"><img src="../assets/nebipad-logo.svg" alt="">NebiPad+ Suite</div>
+      <div class="footer-links"><a href="https://github.com/FHurricane/NebiPadPlusSuite/releases">Download</a><a href="https://github.com/FHurricane/NebiPadPlusSuite/blob/main/README.md">Documentazione</a><a href="https://github.com/FHurricane/NebiPadPlusSuite/blob/main/LICENSE">Licenza</a></div>
+      <div>© <span id="year"></span> NebiPad+ Suite · Developer Costa Fabio</div>
+    </div>
+  </footer>
+
+  <script>
+    const menuButton = document.querySelector('.menu-button');
+    const navLinks = document.querySelector('.nav-links');
+    menuButton.addEventListener('click', () => {
+      const open = navLinks.classList.toggle('open');
+      menuButton.setAttribute('aria-expanded', String(open));
+      menuButton.textContent = open ? '×' : '☰';
+    });
+    navLinks.addEventListener('click', event => {
+      if (event.target.matches('a')) {
+        navLinks.classList.remove('open');
+        menuButton.setAttribute('aria-expanded', 'false');
+        menuButton.textContent = '☰';
+      }
+    });
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
